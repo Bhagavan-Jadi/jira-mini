@@ -1,4 +1,4 @@
-package com.jadi.jira_mini.config;
+package com.jadi.jira_mini.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
