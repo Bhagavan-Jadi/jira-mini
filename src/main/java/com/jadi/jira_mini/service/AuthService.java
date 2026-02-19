@@ -6,7 +6,7 @@ import com.jadi.jira_mini.dto.request.RegisterRequest;
 public interface AuthService {
 
     void register(RegisterRequest request);
-    void authenticate(LoginRequest request);
+    String authenticate(LoginRequest request);
 
 
 

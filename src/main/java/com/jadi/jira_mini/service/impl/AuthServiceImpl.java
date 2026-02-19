@@ -7,6 +7,7 @@ import com.jadi.jira_mini.entity.User;
 import com.jadi.jira_mini.enums.RoleType;
 import com.jadi.jira_mini.repository.RoleRepository;
 import com.jadi.jira_mini.repository.UserRepository;
+import com.jadi.jira_mini.security.JwtTokenProvider;
 import com.jadi.jira_mini.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private  final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void register(RegisterRequest request) {
@@ -45,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void authenticate(LoginRequest request) {
+    public String authenticate(LoginRequest request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -53,5 +55,8 @@ public class AuthServiceImpl implements AuthService {
                         request.getPassword()
                 )
         );
+
+        return jwtTokenProvider.generateToken(request.getEmail());
+
     }
 }
