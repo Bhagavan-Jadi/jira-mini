@@ -14,7 +14,7 @@ public interface ProjectService {
 
 //    List<ProjectResponse> getAllProjects();
 
-    Page<ProjectResponse> getAllProjects(int page,int size,String sortBy,String direction);
+    Page<ProjectResponse> getAllProjects(int page,int size,String sortBy,String direction,Boolean active,String name);
 
 
 }

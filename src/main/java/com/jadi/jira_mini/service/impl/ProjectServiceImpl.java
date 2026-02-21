@@ -70,14 +70,27 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectResponse> getAllProjects(int page,int size,String sortBy,String direction) {
+    public Page<ProjectResponse> getAllProjects(int page,int size,String sortBy,String direction,Boolean active,String name) {
 
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(page,size,sort);
 
-        return projectRepository.findAll(pageable)
-                .map(this::mapToResponse);
+        Page<Project> projectPage;
+
+        if(active != null && name != null) {
+
+            projectPage = projectRepository.findByActiveAndNameContainingIgnoreCase(active,name,pageable);
+        }else if(active != null) {
+            projectPage = projectRepository.findByActive(active,pageable);
+        }else {
+            projectPage = projectRepository.findByNameContainingIgnoreCase(name,pageable);
+        }
+
+        return projectPage.map(this::mapToResponse);
+
+//        return projectRepository.findAll(pageable)
+//                .map(this::mapToResponse);
 
 
 //        return projectRepository.findAll()

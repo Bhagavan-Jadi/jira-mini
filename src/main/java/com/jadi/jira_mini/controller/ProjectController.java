@@ -31,9 +31,11 @@ public class ProjectController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String name
     ) {
 
-        return projectService.getAllProjects(page, size, sortBy, direction);
+        return projectService.getAllProjects(page, size, sortBy, direction,active,name);
     }
 }
