@@ -8,8 +8,13 @@ import com.jadi.jira_mini.repository.ProjectRepository;
 import com.jadi.jira_mini.repository.UserRepository;
 import com.jadi.jira_mini.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -46,6 +51,8 @@ public class ProjectServiceImpl implements ProjectService {
         return mapToResponse(saved);
     }
 
+
+
     private ProjectResponse mapToResponse(Project project) {
 
         return ProjectResponse.builder()
@@ -62,10 +69,20 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponse> getAllProjects() {
-        return projectRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    @Transactional(readOnly = true)
+    public Page<ProjectResponse> getAllProjects(int page,int size,String sortBy,String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        return projectRepository.findAll(pageable)
+                .map(this::mapToResponse);
+
+
+//        return projectRepository.findAll()
+//                .stream()
+//                .map(this::mapToResponse)
+//                .toList();
     }
 }
