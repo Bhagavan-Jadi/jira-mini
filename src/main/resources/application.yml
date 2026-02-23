@@ -16,6 +16,6 @@ server:
   port: 8080
 
 jwt:
-  secret: 1234
+  secret: thisIsAStrongSecretKeyForJwtToken2026
   expiration: 864000
 
