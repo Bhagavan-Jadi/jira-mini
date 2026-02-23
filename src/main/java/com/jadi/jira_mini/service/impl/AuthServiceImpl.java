@@ -5,6 +5,7 @@ import com.jadi.jira_mini.dto.request.RegisterRequest;
 import com.jadi.jira_mini.entity.Role;
 import com.jadi.jira_mini.entity.User;
 import com.jadi.jira_mini.enums.RoleType;
+import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.RoleRepository;
 import com.jadi.jira_mini.repository.UserRepository;
 import com.jadi.jira_mini.security.JwtTokenProvider;
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Role defaultRole = roleRepository.findByName(RoleType.DEVELOPER)
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Default Role not found"));
 
         User user = new User();
         user.setName(request.getName());

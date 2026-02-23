@@ -4,6 +4,7 @@ import com.jadi.jira_mini.dto.request.CreateSprintRequest;
 import com.jadi.jira_mini.dto.response.SprintResponse;
 import com.jadi.jira_mini.entity.Project;
 import com.jadi.jira_mini.entity.Sprint;
+import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.ProjectRepository;
 import com.jadi.jira_mini.repository.SprintRepository;
 import com.jadi.jira_mini.service.SprintService;
@@ -25,7 +26,7 @@ public class SprintServiceImpl implements SprintService {
     public SprintResponse createSprint(CreateSprintRequest request) {
 
         Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         Sprint sprint = new Sprint();
         sprint.setName(request.getName());

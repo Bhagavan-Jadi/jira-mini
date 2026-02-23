@@ -4,6 +4,7 @@ import com.jadi.jira_mini.dto.request.CreateProjectRequest;
 import com.jadi.jira_mini.dto.response.ProjectResponse;
 import com.jadi.jira_mini.entity.Project;
 import com.jadi.jira_mini.entity.User;
+import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.ProjectRepository;
 import com.jadi.jira_mini.repository.UserRepository;
 import com.jadi.jira_mini.service.ProjectService;
@@ -29,13 +30,13 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectResponse CreateProject(CreateProjectRequest request) {
 
         if(projectRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Project is already Exists");
+            throw new ResourceNotFoundException("Project is already Exists");
         }
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User creator = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User Not found"));
 
         Project project = new Project();
 

@@ -6,6 +6,7 @@ import com.jadi.jira_mini.entity.Issue;
 import com.jadi.jira_mini.entity.Sprint;
 import com.jadi.jira_mini.entity.User;
 import com.jadi.jira_mini.enums.IssueStatus;
+import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.IssueRepository;
 import com.jadi.jira_mini.repository.SprintRepository;
 import com.jadi.jira_mini.repository.UserRepository;
@@ -30,12 +31,12 @@ public class IssueServiceImpl implements IssueService {
     public IssueResponse createIssue(IssueRequest request) {
 
         Sprint sprint = sprintRepository.findById(request.getSprintId())
-                .orElseThrow(() -> new RuntimeException("Sprint not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sprint not found"));
 
          String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
          User reporter = userRepository.findByEmail(email)
-                 .orElseThrow(() -> new RuntimeException("Reporter not found"));
+                 .orElseThrow(() -> new ResourceNotFoundException("Reporter not found"));
 
          Issue issue = new Issue();
 
@@ -50,7 +51,7 @@ public class IssueServiceImpl implements IssueService {
 
          if(request.getAssigneeId() != null) {
              User assignee = userRepository.findById(request.getAssigneeId())
-                     .orElseThrow(() -> new RuntimeException("Assignee not found"));
+                     .orElseThrow(() -> new ResourceNotFoundException("Assignee not found"));
 
              issue.setAssignee(assignee);
          }

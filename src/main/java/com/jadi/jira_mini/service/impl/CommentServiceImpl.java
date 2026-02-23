@@ -5,6 +5,7 @@ import com.jadi.jira_mini.dto.response.CommentResponse;
 import com.jadi.jira_mini.entity.Comment;
 import com.jadi.jira_mini.entity.Issue;
 import com.jadi.jira_mini.entity.User;
+import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.CommentRepository;
 import com.jadi.jira_mini.repository.IssueRepository;
 import com.jadi.jira_mini.repository.UserRepository;
@@ -28,12 +29,12 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse addComment(CommentRequest request) {
 
         Issue issue = issueRepository.findById(request.getIssueId())
-                .orElseThrow(() -> new RuntimeException("Issue not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User author = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
 
         Comment comment = new Comment();
         comment.setContent(request.getContent());
