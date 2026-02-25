@@ -3,6 +3,7 @@ package com.jadi.jira_mini.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -73,6 +74,19 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(
+            ObjectOptimisticLockingFailureException ex,
+            HttpServletRequest request ) {
+
+        return buildResponse(
+                "Resource was modified by another transition.Please refresh and try again",
+                HttpStatus.CONFLICT,
+                request
+        );
+    }
+
 
 
 
