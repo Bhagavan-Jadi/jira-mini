@@ -3,9 +3,11 @@ package com.jadi.jira_mini.service.impl;
 import com.jadi.jira_mini.dto.request.IssueRequest;
 import com.jadi.jira_mini.dto.response.IssueResponse;
 import com.jadi.jira_mini.entity.Issue;
+import com.jadi.jira_mini.entity.Role;
 import com.jadi.jira_mini.entity.Sprint;
 import com.jadi.jira_mini.entity.User;
 import com.jadi.jira_mini.enums.IssueStatus;
+import com.jadi.jira_mini.exception.BadRequestException;
 import com.jadi.jira_mini.exception.ResourceNotFoundException;
 import com.jadi.jira_mini.repository.IssueRepository;
 import com.jadi.jira_mini.repository.SprintRepository;
@@ -90,5 +92,67 @@ public class IssueServiceImpl implements IssueService {
 
         return issueRepository.findAll(PageRequest.of(page,size))
                 .map(this::mapToResponse);
+    }
+
+    @Override
+    public IssueResponse updateStatus(Long issueId, IssueStatus newStatus) {
+
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
+
+        IssueStatus currentStatus = issue.getIssueStatus();
+
+        if(!isValidTransition(currentStatus,newStatus)) {
+
+            throw new BadRequestException("Invalid status transition");
+        }
+
+        String role = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .findFirst()
+                .orElseThrow()
+                .getAuthority()
+                .replace("ROLE_","");
+
+
+        if(!isRoleAllowed(currentStatus,newStatus,role)) {
+
+            throw new BadRequestException("Role not allowed to perform this action");
+        }
+
+        issue.setIssueStatus(newStatus);
+        Issue updated = issueRepository.save(issue);
+
+        return mapToResponse(updated);
+    }
+
+    private boolean isValidTransition(IssueStatus current,IssueStatus target) {
+
+        return switch (current) {
+            case TODO -> target == IssueStatus.IN_PROGRESS;
+            case IN_PROGRESS -> target == IssueStatus.CODE_REVIEW;
+            case CODE_REVIEW -> target == IssueStatus.TESTING;
+            case TESTING -> target == IssueStatus.DONE;
+            case DONE -> false;
+        };
+    }
+
+    public boolean isRoleAllowed(IssueStatus current, IssueStatus target, String role) {
+
+        if(role.equals("ADMIN")) {
+            return true;
+        }
+        else if(role.equals("DEVELOPER")) {
+
+            return current == IssueStatus.TODO && target == IssueStatus.IN_PROGRESS ||
+                    current == IssueStatus.IN_PROGRESS && target == IssueStatus.CODE_REVIEW;
+        }
+        else if(role.equals("TESTER")) {
+            return current == IssueStatus.TESTING && target == IssueStatus.DONE;
+        }
+
+        return false;
     }
 }
